@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 from calculadora_distancia import calcular_distancia_haversine
 
-archivo_aeropuertos = 'D:/OneDrive - Universidad Peruana de Ciencias/UPC - Ingeniería de Software/2024-2 – Cuarto ciclo/2. Complejidad Algorítmica/red_de_trafico_aereo/data/airports.csv'
-archivo_rutas = 'D:/OneDrive - Universidad Peruana de Ciencias/UPC - Ingeniería de Software/2024-2 – Cuarto ciclo/2. Complejidad Algorítmica/red_de_trafico_aereo/data/routes.csv'
+archivo_aeropuertos = "data/airports.csv"
+archivo_rutas = "data/routes.csv"
 #asd
 df_aeropuertos = pd.read_csv(archivo_aeropuertos)
 df_rutas = pd.read_csv(archivo_rutas) 
