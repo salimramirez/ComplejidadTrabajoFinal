@@ -1,88 +1,160 @@
-import pandas as pd
-import networkx as nx
-import matplotlib.pyplot as plt
-from mpl_toolkits.basemap import Basemap
-from calculadora_distancia import calcular_distancia_haversine
+import tkinter as tk
+from tkinter import messagebox
+from PIL import Image, ImageTk
+from grafo_visualizacion import mostrar_mapa, calcular_dijkstra_desde_lima, calcular_dijkstra_ingresado
 
-archivo_aeropuertos = "data/airports.csv"
-archivo_rutas = "data/routes.csv"
-#asd
-df_aeropuertos = pd.read_csv(archivo_aeropuertos)
-df_rutas = pd.read_csv(archivo_rutas) 
+# Función para mostrar los créditos
+def mostrar_creditos():
+    # Crear ventana de créditos
+    ventana_creditos = tk.Toplevel()
+    ventana_creditos.title("Créditos")
+    ventana_creditos.geometry("600x400")
 
-df_aeropuertos['IATA'] = df_aeropuertos['IATA'].str.replace('"', '').str.strip().str.upper()
-df_rutas['Source_Airport'] = df_rutas['Source_Airport'].str.strip().str.upper()
-df_rutas['Destination_Airport'] = df_rutas['Destination_Airport'].str.strip().str.upper()
+    # Título
+    titulo_creditos = tk.Label(ventana_creditos, text="Créditos", font=("Arial", 24, "bold"), fg="darkblue")
+    titulo_creditos.pack(pady=10)
 
-df_aeropuertos['Latitude'] = pd.to_numeric(df_aeropuertos['Latitude'], errors='coerce')
-df_aeropuertos['Longitude'] = pd.to_numeric(df_aeropuertos['Longitude'], errors='coerce')
+    # Subtítulo
+    subtitulo = tk.Label(ventana_creditos, text="Integrantes", font=("Arial", 16, "italic"), fg="purple")
+    subtitulo.pack(pady=10)
 
-df_aeropuertos_america = df_aeropuertos[(df_aeropuertos['Latitude'] >= -60) & 
-                                        (df_aeropuertos['Latitude'] <= 70) &
-                                        (df_aeropuertos['Longitude'] >= -170) &
-                                        (df_aeropuertos['Longitude'] <= -30)]
+    # Contenedor para imágenes y nombres
+    frame_integrantes = tk.Frame(ventana_creditos)
+    frame_integrantes.pack(pady=20)
 
-df_rutas_filtradas = df_rutas[df_rutas['Source_Airport'].isin(df_aeropuertos_america['IATA']) &
-                              df_rutas['Destination_Airport'].isin(df_aeropuertos_america['IATA'])]
+    # Información de los integrantes (imágenes y nombres)
+    integrantes = [
+        {"nombre": "Salim Ramirez", "imagen": "./data/integrante1.png"},
+        {"nombre": "Anjali Amaro", "imagen": "./data/integrante2.png"},
+        {"nombre": "Paul Sulca", "imagen": "./data/integrante3.png"}
+    ]
 
-aeropuertos_con_rutas = pd.concat([df_rutas_filtradas['Source_Airport'], df_rutas_filtradas['Destination_Airport']]).unique()
-df_aeropuertos_con_rutas = df_aeropuertos_america[df_aeropuertos_america['IATA'].isin(aeropuertos_con_rutas)]
+    for integrante in integrantes:
+        # Crear subframe para cada integrante
+        subframe = tk.Frame(frame_integrantes)
+        subframe.pack(side=tk.LEFT, padx=10)
 
-df_aeropuertos_limited = df_aeropuertos_con_rutas.head(1500)
+        # Cargar y mostrar la imagen del integrante
+        try:
+            img = Image.open(integrante["imagen"])
+            img = img.resize((100, 100), Image.Resampling.LANCZOS)
+            img_tk = ImageTk.PhotoImage(img)
 
-print(f"Cantidad de aeropuertos en América: {len(df_aeropuertos_america)}")
-print(f"Cantidad de aeropuertos que se graficarán: {len(df_aeropuertos_limited)}")
+            label_imagen = tk.Label(subframe, image=img_tk)
+            label_imagen.image = img_tk  # Mantener referencia
+            label_imagen.pack()
+        except FileNotFoundError:
+            tk.Label(subframe, text="Sin imagen", font=("Arial", 10), fg="red").pack()
 
-grafo = nx.Graph()
+        # Mostrar el nombre del integrante
+        label_nombre = tk.Label(subframe, text=integrante["nombre"], font=("Arial", 12, "bold"), fg="green")
+        label_nombre.pack()
 
-for _, aeropuerto in df_aeropuertos_limited.iterrows():
-    grafo.add_node(aeropuerto['IATA'], nombre=aeropuerto['Name'], ciudad=aeropuerto['City'], latitud=aeropuerto['Latitude'], longitud=aeropuerto['Longitude'])
+    # Botón para cerrar la ventana de créditos
+    btn_cerrar = tk.Button(ventana_creditos, text="Cerrar", command=ventana_creditos.destroy, font=("Arial", 12), bg="lightblue")
+    btn_cerrar.pack(pady=20)
 
-df_rutas_filtradas_limited = df_rutas_filtradas[df_rutas_filtradas['Source_Airport'].isin(df_aeropuertos_limited['IATA']) &
-                                                df_rutas_filtradas['Destination_Airport'].isin(df_aeropuertos_limited['IATA'])]
+# Función para abrir la ventana de cálculo de Dijkstra
+def abrir_ventana_dijkstra():
+    # Crear nueva ventana
+    ventana_dijkstra = tk.Toplevel()
+    ventana_dijkstra.title("Calcular menor distancia entre dos nodos")
+    ventana_dijkstra.geometry("500x300")
 
-for _, ruta in df_rutas_filtradas_limited.iterrows():
-    origen = ruta['Source_Airport']
-    destino = ruta['Destination_Airport']
+    # Título
+    titulo = tk.Label(ventana_dijkstra, text="Calcular menor distancia entre dos nodos", font=("Arial", 16, "bold"))
+    titulo.pack(pady=10)
 
-    aeropuerto_origen = df_aeropuertos[df_aeropuertos['IATA'] == origen].iloc[0]
-    aeropuerto_destino = df_aeropuertos[df_aeropuertos['IATA'] == destino].iloc[0]
+    # Subtítulo
+    subtitulo = tk.Label(ventana_dijkstra, text="Algoritmo de Dijkstra", font=("Arial", 14, "italic"))
+    subtitulo.pack(pady=5)
 
-    latitud_origen, longitud_origen = float(aeropuerto_origen['Latitude']), float(aeropuerto_origen['Longitude'])
-    latitud_destino, longitud_destino = float(aeropuerto_destino['Latitude']), float(aeropuerto_destino['Longitude'])
+    # Texto informativo
+    texto = tk.Label(
+        ventana_dijkstra,
+        text="Elija una opción para calcular la menor distancia entre dos nodos y elegir la ruta óptima",
+        font=("Arial", 12),
+        wraplength=400,
+        justify="center"
+    )
+    texto.pack(pady=20)
 
-    distancia = calcular_distancia_haversine(latitud_origen, longitud_origen, latitud_destino, longitud_destino)
+    # Contenedor para los botones
+    frame_botones = tk.Frame(ventana_dijkstra)
+    frame_botones.pack(pady=10)
 
-    distancia_redondeada = round(distancia, 2)
+    # Botón "Calcular desde Lima, Perú"
+    btn_desde_lima = tk.Button(
+        frame_botones,
+        text="Calcular desde Lima, Perú",
+        command=calcular_dijkstra_desde_lima,
+        font=("Arial", 12),
+        bg="lightblue",
+        width=20
+    )
+    btn_desde_lima.pack(side=tk.LEFT, padx=10)
 
-    grafo.add_edge(origen, destino, peso=distancia_redondeada)
+    # Botón "Ingresar un origen"
+    btn_ingresar_origen = tk.Button(
+        frame_botones,
+        text="Ingresar un origen",
+        command=calcular_dijkstra_ingresado,
+        font=("Arial", 12),
+        bg="lightgreen",
+        width=20
+    )
+    btn_ingresar_origen.pack(side=tk.LEFT, padx=10)
 
-plt.figure(figsize=(15, 10))
-mapa = Basemap(projection='mill', llcrnrlat=-60, urcrnrlat=90, llcrnrlon=-180, urcrnrlon=180, resolution='c')
+    # Botón para cerrar la ventana
+    btn_cerrar = tk.Button(ventana_dijkstra, text="Cerrar", command=ventana_dijkstra.destroy, font=("Arial", 12))
+    btn_cerrar.pack(pady=20)
 
-mapa.drawmapboundary(fill_color='lightblue')
-mapa.fillcontinents(color='beige', lake_color='lightblue') 
-mapa.drawcoastlines(color='gray')
-mapa.drawcountries(color='black')  
+# Crear ventana principal
+ventana = tk.Tk()
+ventana.title("Red de Tráfico Aéreo")
+ventana.geometry("800x600")
 
-posiciones = {}
-for _, aeropuerto in df_aeropuertos_limited.iterrows():
-    x, y = mapa(aeropuerto['Longitude'], aeropuerto['Latitude'])
-    posiciones[aeropuerto['IATA']] = (x, y)
-    mapa.plot(x, y, 'bo', markersize=5)
+# Título
+titulo = tk.Label(
+    ventana, 
+    text="Red de Tráfico Aéreo", 
+    font=("Century", 28, "bold"),  # Fuente Century, más formal
+    fg="darkblue",  # Texto en azul oscuro
+    padx=20, 
+    pady=10
+)
 
-for origen, destino, datos in grafo.edges(data=True):
-    x_origen, y_origen = posiciones[origen]
-    x_destino, y_destino = posiciones[destino]
-    mapa.plot([x_origen, x_destino], [y_origen, y_destino], color='blue', linewidth=1)
+titulo.pack(pady=20)
 
-edge_labels = { (origen, destino): f"{datos['peso']} km" for origen, destino, datos in grafo.edges(data=True) }
+# Imagen
+ruta_imagen = "./data/imagen_principal.png"
+try:
+    imagen = Image.open(ruta_imagen)
+    imagen = imagen.resize((400, 300), Image.Resampling.LANCZOS)
+    imagen_tk = ImageTk.PhotoImage(imagen)
+    label_imagen = tk.Label(ventana, image=imagen_tk)
+    label_imagen.image = imagen_tk  # Referencia para evitar garbage collection
+    label_imagen.pack(pady=10)
+except FileNotFoundError:
+    tk.Label(ventana, text="No se encontró la imagen. Verifica la ruta.", font=("Arial", 12), fg="red").pack(pady=10)
 
-nx.draw_networkx_edge_labels(grafo, posiciones, edge_labels=edge_labels, font_size=8, bbox=dict(alpha=0))
+# Botón "Ver Mapa"
+btn_ver_mapa = tk.Button(ventana, text="Ver Mapa", command=lambda: mostrar_mapa(ventana), font=("Arial", 14), bg="lightblue")
+btn_ver_mapa.pack(pady=10)
 
-nx.draw(grafo, posiciones, with_labels=True, node_size=500, node_color="red", font_size=8, font_weight="bold")
+# Botón "Calcular Dijkstra"
+btn_dijkstra = tk.Button(
+    ventana, 
+    text="Calcular Dijkstra", 
+    command=abrir_ventana_dijkstra, 
+    font=("Arial", 14), 
+    bg="lightgreen"
+)
+btn_dijkstra.pack(pady=10)
 
-plt.title("Red de Tráfico Aéreo en América (1500 Aeropuertos)")
-plt.show()
+# Botón "Ver Créditos"
+btn_creditos = tk.Button(ventana, text="Ver Créditos", command=mostrar_creditos, font=("Arial", 14), bg="lightyellow")
+btn_creditos.pack(pady=10)
 
-print(f"Grafo creado con {grafo.number_of_nodes()} aeropuertos y {grafo.number_of_edges()} aristas.")
+# Ejecutar aplicación
+ventana.mainloop()
