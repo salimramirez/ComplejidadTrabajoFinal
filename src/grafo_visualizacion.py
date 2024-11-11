@@ -164,7 +164,7 @@ def mostrar_resultado_dijkstra(distancia, ruta):
     distancia_label.pack(pady=10)
 
     # Detalles de la ruta (con nombres completos de los aeropuertos)
-    ruta_detallada = "\n".join([f"{nodo} ({grafo.nodes[nodo].get('nombre', 'Nombre no disponible')})" for nodo in ruta])
+    ruta_detallada = "\n".join([f"{nodo} - {grafo.nodes[nodo].get('nombre', 'Nombre no disponible')}" for nodo in ruta])
     ruta_label = tk.Label(
         ventana_resultado,
         text=f"Ruta óptima:\n{ruta_detallada}",
