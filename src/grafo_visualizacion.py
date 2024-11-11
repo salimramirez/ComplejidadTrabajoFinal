@@ -5,6 +5,7 @@ import tkinter as tk
 from mpl_toolkits.basemap import Basemap
 from calculadora_distancia import calcular_distancia_haversine
 from dijkstra import dijkstra
+from visualizar_grafo_dijkstra import visualizar_ruta_en_mapa
 
 grafo = None  # Variable global para almacenar el grafo
 
@@ -139,56 +140,57 @@ def calcular_dijkstra_ingresado():
         tk.messagebox.showerror("Error", str(e))
 
 def mostrar_resultado_dijkstra(distancia, ruta):
-    # Crear una nueva ventana para mostrar los resultados
+    global grafo  # Para acceder al grafo global
     ventana_resultado = tk.Toplevel()
     ventana_resultado.title("Resultado de Dijkstra")
     ventana_resultado.geometry("600x400")
 
     # Título
     titulo = tk.Label(
-        ventana_resultado, 
-        text="Resultado del Algoritmo de Dijkstra", 
-        font=("Arial", 18, "bold"), 
+        ventana_resultado,
+        text="Resultado del Algoritmo de Dijkstra",
+        font=("Arial", 18, "bold"),
         fg="darkblue"
     )
     titulo.pack(pady=20)
 
-    # Subtítulo
-    subtitulo = tk.Label(
-        ventana_resultado, 
-        text="La ruta más corta y su distancia", 
-        font=("Arial", 14, "italic"), 
-        fg="purple"
-    )
-    subtitulo.pack(pady=10)
-
     # Información de la distancia
     distancia_label = tk.Label(
-        ventana_resultado, 
-        text=f"Distancia más corta: {distancia:.2f} km", 
-        font=("Arial", 14), 
+        ventana_resultado,
+        text=f"Distancia más corta: {distancia:.2f} km",
+        font=("Arial", 14),
         fg="green"
     )
     distancia_label.pack(pady=10)
 
     # Detalles de la ruta
-    ruta_detallada = "\n".join([f"{nodo} ({grafo.nodes[nodo]['nombre']})" for nodo in ruta])
+    ruta_detallada = " -> ".join(ruta)
     ruta_label = tk.Label(
-        ventana_resultado, 
-        text=f"Ruta óptima:\n{ruta_detallada}", 
-        font=("Arial", 12), 
+        ventana_resultado,
+        text=f"Ruta óptima:\n{ruta_detallada}",
+        font=("Arial", 12),
         fg="black",
-        justify="left",
-        wraplength=500
+        wraplength=500,
+        justify="left"
     )
     ruta_label.pack(pady=10)
 
-    # Botón para cerrar la ventana
-    btn_cerrar = tk.Button(
-        ventana_resultado, 
-        text="Cerrar", 
-        command=ventana_resultado.destroy, 
-        font=("Arial", 12), 
+    # Botón para mostrar la ruta en un mapa personalizado
+    btn_mapa = tk.Button(
+        ventana_resultado,
+        text="Visualizar Ruta en Mapa",
+        command=lambda: visualizar_ruta_en_mapa(grafo, ruta),
+        font=("Arial", 12),
         bg="lightblue"
     )
-    btn_cerrar.pack(pady=20)
+    btn_mapa.pack(pady=20)  # Agregar al diseño de la ventana
+
+    # Botón para cerrar la ventana
+    btn_cerrar = tk.Button(
+        ventana_resultado,
+        text="Cerrar",
+        command=ventana_resultado.destroy,
+        font=("Arial", 12),
+        bg="lightblue"
+    )
+    btn_cerrar.pack(pady=10)
