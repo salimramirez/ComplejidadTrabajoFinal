@@ -1,7 +1,40 @@
 import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk
-from grafo_visualizacion import mostrar_mapa, calcular_dijkstra_desde_lima, calcular_dijkstra_ingresado
+from utils.grafo_visualizacion import mostrar_mapa, calcular_dijkstra_desde_lima, calcular_dijkstra_ingresado
+from database.database import conectar_db, cargar_aeropuertos, cargar_rutas
+from utils.ventana_buscar import abrir_ventana_dijkstra_con_busqueda
+
+
+AIRPORTS_CSV = "data/airports.csv"
+ROUTES_CSV = "data/routes.csv"
+
+
+def verificar_datos_cargados():
+    conn = conectar_db()
+    cursor = conn.cursor()
+    # Verificar si existen aeropuertos y rutas
+    cursor.execute("SELECT COUNT(*) FROM aeropuertos WHERE pais IS NOT NULL")
+    aeropuertos_con_pais = cursor.fetchone()[0]
+    cursor.execute("SELECT COUNT(*) FROM rutas")
+    rutas_count = cursor.fetchone()[0]
+    conn.close()
+    return aeropuertos_con_pais, rutas_count
+
+
+if __name__ == "__main__":
+    aeropuertos_con_pais, rutas_count = verificar_datos_cargados()
+    if aeropuertos_con_pais == 0:
+        print("Actualizando aeropuertos...")
+        cargar_aeropuertos(AIRPORTS_CSV)
+    else:
+        print("Los aeropuertos ya están cargados y completos.")
+    if rutas_count == 0:
+        print("Cargando rutas...")
+        cargar_rutas(ROUTES_CSV)
+    else:
+        print("Las rutas ya están cargadas.")
+
 
 # Función para mostrar los créditos
 def mostrar_creditos():
@@ -59,7 +92,7 @@ def abrir_ventana_dijkstra():
     # Crear nueva ventana
     ventana_dijkstra = tk.Toplevel()
     ventana_dijkstra.title("Calcular menor distancia entre dos nodos")
-    ventana_dijkstra.geometry("500x300")
+    ventana_dijkstra.geometry("500x400")
 
     # Título
     titulo = tk.Label(ventana_dijkstra, text="Calcular menor distancia entre dos nodos", font=("Arial", 16, "bold"))
@@ -105,9 +138,25 @@ def abrir_ventana_dijkstra():
     )
     btn_ingresar_origen.pack(side=tk.LEFT, padx=10)
 
+    # Botón "Buscar y Calcular Dijkstra"
+    btn_buscar_dijkstra = tk.Button(
+        ventana_dijkstra,
+        text="Buscar y Calcular Dijkstra",
+        command=abrir_ventana_dijkstra_con_busqueda,
+        font=("Arial", 14),
+        bg="lightcoral"
+    )
+    btn_buscar_dijkstra.pack(pady=20)
+
     # Botón para cerrar la ventana
-    btn_cerrar = tk.Button(ventana_dijkstra, text="Cerrar", command=ventana_dijkstra.destroy, font=("Arial", 12))
-    btn_cerrar.pack(pady=20)
+    btn_cerrar = tk.Button(
+        ventana_dijkstra,
+        text="Cerrar",
+        command=ventana_dijkstra.destroy,
+        font=("Arial", 12),
+        bg="red"
+    )
+    btn_cerrar.pack(pady=10)
 
 # Crear ventana principal
 ventana = tk.Tk()

@@ -1,0 +1,19 @@
+# Ignorar el entorno virtual
+env/
+
+# Archivos compilados de Python
+src/utils/__pycache__/
+*.pyc
+*.pyo
+src/database/__pycache__/
+
+
+# Archivos de configuración del editor
+.vscode/
+.idea/
+
+# Archivos de sistema
+*.DS_Store
+Thumbs.db
+
+mapa_rutas_aereas.html
