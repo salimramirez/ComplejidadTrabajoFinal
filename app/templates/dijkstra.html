@@ -36,7 +36,7 @@
             <p><strong>Distancia:</strong> {{ distancia }} km</p>
             <p><strong>Ruta:</strong> {{ ruta | join(' → ') }}</p>
             <h3>Visualización de la Ruta:</h3>
-            <img src="{{ imagen_grafo }}" alt="Ruta Mínima" style="max-width: 100%; height: auto;">
+            <img src="{{ url_for('static', filename='img/ruta_dijkstra.png') }}" alt="Ruta Mínima" style="max-width: 100%; height: auto;">
         {% endif %}
     </main>
     <footer>

@@ -1,5 +1,7 @@
 import networkx as nx
 import sqlite3
+import matplotlib.pyplot as plt
+from mpl_toolkits.basemap import Basemap
 
 
 def conectar_db():
@@ -60,3 +62,32 @@ def calcular_dijkstra(grafo, origen, destino):
         return distancia, ruta
     except nx.NetworkXNoPath:
         raise ValueError(f"No existe una ruta válida entre {origen} y {destino}.")
+    
+def graficar_ruta(grafo, ruta, output_path="app/static/img/ruta_dijkstra.png"):
+    """Genera una visualización de la ruta mínima y la guarda como imagen."""
+    plt.figure(figsize=(15, 10))
+    mapa = Basemap(projection='mill', llcrnrlat=-60, urcrnrlat=90, llcrnrlon=-180, urcrnrlon=180, resolution='c')
+    mapa.drawmapboundary(fill_color='lightblue')
+    mapa.fillcontinents(color='beige', lake_color='lightblue')
+    mapa.drawcoastlines(color='gray')
+    mapa.drawcountries(color='black')
+
+    # Obtener las posiciones de los nodos
+    posiciones = {}
+    for nodo in ruta:
+        datos = grafo.nodes[nodo]
+        x, y = mapa(datos['longitud'], datos['latitud'])
+        posiciones[nodo] = (x, y)
+        mapa.plot(x, y, 'ro', markersize=8)  # Nodos en rojo
+        plt.text(x, y, nodo, fontsize=10, ha='right', va='bottom', color='darkblue')
+
+    # Dibujar las aristas de la ruta
+    for i in range(len(ruta) - 1):
+        origen, destino = ruta[i], ruta[i + 1]
+        x_origen, y_origen = posiciones[origen]
+        x_destino, y_destino = posiciones[destino]
+        mapa.plot([x_origen, x_destino], [y_origen, y_destino], color='blue', linewidth=2)
+
+    plt.title("Ruta Mínima Calculada con Dijkstra", fontsize=14)
+    plt.savefig(output_path)
+    plt.close()
