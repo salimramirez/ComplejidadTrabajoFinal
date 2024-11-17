@@ -1,0 +1,26 @@
+# Ignorar el entorno virtual
+/env
+
+# Ignorar archivos compilados de Python
+*.pyc
+__pycache__/
+
+
+
+# Ignorar archivos de configuración temporal o locales
+*.log
+
+# Ignorar imágenes generadas dinámicamente
+app/static/img/*.png
+
+# Ignorar configuraciones específicas del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Ignorar carpetas de configuración de IDEs y editores de texto
+.vscode/
+
+
+# Ignorar dependencias instaladas localmente
+*.egg-info/
+*.eggs/

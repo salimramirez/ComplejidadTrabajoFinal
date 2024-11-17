@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Red de Tráfico Aéreo{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Red de Tráfico Aéreo</h1>
+        <nav>
+            <a href="{{ url_for('main.index') }}">Inicio</a>
+            <a href="{{ url_for('dijkstra.calcular_ruta') }}">Calcular Ruta</a>
+            <a href="{{ url_for('buscar.buscar') }}">Buscar Aeropuertos</a>
+            <a href="{{ url_for('grafo.visualizar_grafo') }}">Información del Grafo</a>
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <p>&copy; 2024 Red de Tráfico Aéreo</p>
+    </footer>
+</body>
+</html>

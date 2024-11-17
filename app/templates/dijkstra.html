@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcular Ruta con Dijkstra</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Calcular Ruta Mínima con Dijkstra</h1>
+        <nav>
+            <a href="{{ url_for('main.index') }}">Inicio</a>
+            <a href="{{ url_for('dijkstra.calcular_ruta') }}">Calcular Ruta</a>
+            <a href="{{ url_for('buscar.buscar') }}">Buscar Aeropuertos</a>
+            <a href="{{ url_for('grafo.visualizar_grafo') }}">Información del Grafo</a>
+        </nav>
+    </header>
+    <main>
+        <h2>Ingrese los Códigos IATA de Origen y Destino</h2>
+        {% if error %}
+            <p style="color:red;">{{ error }}</p>
+        {% endif %}
+        <form method="POST">
+            <label for="origen">Origen (IATA):</label>
+            <input type="text" id="origen" name="origen" required>
+            <br><br>
+            <label for="destino">Destino (IATA):</label>
+            <input type="text" id="destino" name="destino" required>
+            <br><br>
+            <button type="submit">Calcular Ruta</button>
+        </form>
+
+        {% if distancia and ruta %}
+            <h3>Resultado:</h3>
+            <p><strong>Distancia:</strong> {{ distancia }} km</p>
+            <p><strong>Ruta:</strong> {{ ruta | join(' → ') }}</p>
+            <h3>Visualización de la Ruta:</h3>
+            <img src="{{ imagen_grafo }}" alt="Ruta Mínima" style="max-width: 100%; height: auto;">
+        {% endif %}
+    </main>
+    <footer>
+        <p>&copy; 2024 Red de Tráfico Aéreo</p>
+    </footer>
+</body>
+</html>

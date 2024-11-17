@@ -1,0 +1,30 @@
+<!-- buscar.html -->
+{% extends "base.html" %}
+
+{% block title %}Buscar Aeropuertos{% endblock %}
+
+{% block content %}
+<h2>Buscar Aeropuertos</h2>
+<form method="POST">
+    <label for="criterio">Ciudad o País:</label>
+    <input type="text" id="criterio" name="criterio" required>
+    <button type="submit">Buscar</button>
+</form>
+
+<h3>Resultados:</h3>
+<form method="POST" action="/buscar/seleccionar">
+    <ul>
+        {% for aeropuerto in resultados %}
+        <li>
+            <input type="radio" id="{{ aeropuerto[0] }}" name="aeropuerto" value="{{ aeropuerto[0] }}" required>
+            <label for="{{ aeropuerto[0] }}">{{ aeropuerto[0] }} - {{ aeropuerto[1] }} ({{ aeropuerto[2] }}, {{ aeropuerto[3] }})</label>
+        </li>
+        {% else %}
+        <li>No se encontraron resultados.</li>
+        {% endfor %}
+    </ul>
+    {% if resultados %}
+    <button type="submit">Seleccionar</button>
+    {% endif %}
+</form>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+<div>
+    <h2>Bienvenido</h2>
+    <p>Selecciona una de las opciones:</p>
+    <ul>
+        <li><a href="{{ url_for('dijkstra.calcular_ruta') }}">Calcular Ruta</a></li>
+        <li><a href="{{ url_for('buscar.buscar') }}">Buscar Aeropuertos</a></li>
+        <li><a href="{{ url_for('grafo.visualizar_grafo') }}">Ver Información del Grafo</a></li>
+    </ul>
+</div>
+{% endblock %}
