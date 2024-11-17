@@ -1,18 +1,27 @@
-<!-- buscar.html -->
 {% extends "base.html" %}
 
 {% block title %}Buscar Aeropuertos{% endblock %}
 
 {% block content %}
 <h2>Buscar Aeropuertos</h2>
+
+{% if not seleccion.origen %}
+<h3>Seleccione el Nodo de Origen</h3>
+{% elif not seleccion.destino %}
+<h3>Seleccione el Nodo de Destino</h3>
+<p><strong>Origen Seleccionado:</strong> {{ seleccion.origen }}</p>
+{% endif %}
+
 <form method="POST">
+    <input type="hidden" name="modo" value="{{ 'origen' if not seleccion.origen else 'destino' }}">
     <label for="criterio">Ciudad o País:</label>
     <input type="text" id="criterio" name="criterio" required>
     <button type="submit">Buscar</button>
 </form>
 
 <h3>Resultados:</h3>
-<form method="POST" action="/buscar/seleccionar">
+<form method="POST">
+    <input type="hidden" name="modo" value="{{ 'origen' if not seleccion.origen else 'destino' }}">
     <ul>
         {% for aeropuerto in resultados %}
         <li>
@@ -27,4 +36,17 @@
     <button type="submit">Seleccionar</button>
     {% endif %}
 </form>
+
+{% if distancia and ruta %}
+<h3>Resultado:</h3>
+<p><strong>Origen:</strong> {{ seleccion.origen }}</p>
+<p><strong>Destino:</strong> {{ seleccion.destino }}</p>
+<p><strong>Distancia:</strong> {{ distancia }} km</p>
+<p><strong>Ruta:</strong> {{ ruta | join(' → ') }}</p>
+<h3>Visualización de la Ruta:</h3>
+<img src="{{ url_for('static', filename='img/ruta_buscar.png') }}" alt="Ruta Mínima" style="max-width: 100%; height: auto;">
+<form method="POST" action="{{ url_for('buscar.reiniciar') }}">
+    <button type="submit">Reiniciar Búsqueda</button>
+</form>
+{% endif %}
 {% endblock %}

@@ -5,6 +5,7 @@ from app.utils.grafo_visualizacion import cargar_grafo
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'Polfer03#'  # Cambia esto por una clave segura
+app.secret_key = 'Polfer03#'
 
 # Cargar el grafo global
 try:
