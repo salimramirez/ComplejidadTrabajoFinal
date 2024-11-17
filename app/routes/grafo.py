@@ -8,7 +8,7 @@ def visualizar_grafo():
     try:
         # Cargar el grafo y guardar un subgrafo como imagen
         grafo = cargar_grafo()
-        mostrar_subgrafo(grafo)
+        mostrar_subgrafo("app/static/img/grafo.png", 300)
         return render_template('grafo.html')
     except Exception as e:
         return f"Error al cargar el grafo: {e}"

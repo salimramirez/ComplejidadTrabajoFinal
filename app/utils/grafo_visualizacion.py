@@ -3,7 +3,7 @@ import sqlite3
 import matplotlib.pyplot as plt
 import random
 from mpl_toolkits.basemap import Basemap
-
+import os
 
 def conectar_db():
     """Conecta a la base de datos SQLite."""
@@ -52,28 +52,43 @@ def cargar_grafo():
     return grafo
 
 
-def mostrar_subgrafo(grafo, ruta="app/static/img/grafo.png", num_nodos=50):
+def mostrar_subgrafo(ruta, num_nodos):
     """
-    Muestra un subgrafo conectado con al menos 'num_nodos' nodos y guarda el resultado como imagen PNG.
+    Genera un subgrafo conectado con exactamente 'num_nodos' nodos y guarda la imagen en 'ruta'.
     """
+    if not isinstance(ruta, str):
+        raise ValueError(f"El argumento 'ruta' debe ser una cadena que indique la ubicación del archivo, pero se recibió: {type(ruta)}")
+
+    if not isinstance(num_nodos, int) or num_nodos <= 0:
+        raise ValueError(f"El argumento 'num_nodos' debe ser un entero positivo, pero se recibió: {num_nodos}")
+
     try:
-        # Asegurarse de que hay suficientes nodos y aristas
+        # Cargar el grafo desde la base de datos
+        grafo = cargar_grafo()
+        print(f"Nodos cargados: {grafo.number_of_nodes()}")
+        print(f"Aristas cargadas: {grafo.number_of_edges()}")
+
         if grafo.number_of_nodes() == 0 or grafo.number_of_edges() == 0:
             raise ValueError("El grafo no contiene nodos o aristas.")
 
-        # Buscar un componente conectado con suficientes nodos
+        # Seleccionar un componente conectado que tenga al menos 'num_nodos' nodos
+        subgrafo = None
         for componente in nx.connected_components(grafo):
-            if len(componente) >= num_nodos - 10:
-                nodos_conectados = list(componente)
+            if len(componente) >= num_nodos:
+                # Convertir el conjunto a lista y seleccionar 'num_nodos' nodos
+                nodos_seleccionados = random.sample(list(componente), num_nodos)
+                subgrafo = grafo.subgraph(nodos_seleccionados)
                 break
-        else:
-            raise ValueError(f"No hay componentes conectados con al menos {num_nodos} nodos.")
 
-        # Seleccionar los primeros 'num_nodos' nodos del componente conectado
-        nodos_seleccionados = random.sample(nodos_conectados, num_nodos)
-        subgrafo = grafo.subgraph(nodos_seleccionados)
+        if subgrafo is None:
+            raise ValueError(f"No se encontró un componente conectado con al menos {num_nodos} nodos.")
 
-        # Crear el fondo del mapa con Basemap
+        # Crear la carpeta de destino si no existe
+        carpeta = os.path.dirname(ruta)
+        if not os.path.exists(carpeta):
+            os.makedirs(carpeta)
+
+        # Crear el gráfico
         plt.figure(figsize=(15, 10))
         mapa = Basemap(projection='mill', llcrnrlat=-60, urcrnrlat=90, llcrnrlon=-180, urcrnrlon=180, resolution='c')
         mapa.drawmapboundary(fill_color='lightblue')
@@ -81,38 +96,22 @@ def mostrar_subgrafo(grafo, ruta="app/static/img/grafo.png", num_nodos=50):
         mapa.drawcoastlines(color='gray')
         mapa.drawcountries(color='black')
 
-        # Obtener las posiciones de los nodos en el mapa
+        # Dibujar nodos y posiciones
         posiciones = {}
         for nodo, datos in subgrafo.nodes(data=True):
             x, y = mapa(datos['longitud'], datos['latitud'])
             posiciones[nodo] = (x, y)
-            mapa.plot(x, y, 'ro', markersize=8)  # Nodos
-            plt.text(x, y, nodo, fontsize=9, ha='right', va='bottom', color='darkblue')  # Código IATA del nodo
+            mapa.plot(x, y, 'ro', markersize=8)
+            plt.text(x, y, nodo, fontsize=9, ha='right', va='bottom', color='darkblue')
 
-        # Dibujar las aristas
+        # Dibujar aristas
         for origen, destino, datos in subgrafo.edges(data=True):
-            try:
-                # Obtener las posiciones de los nodos
-                x_origen, y_origen = posiciones[origen]
-                x_destino, y_destino = posiciones[destino]
+            x_origen, y_origen = posiciones[origen]
+            x_destino, y_destino = posiciones[destino]
+            mapa.plot([x_origen, x_destino], [y_origen, y_destino], color='blue', linewidth=1)
 
-                # Obtener el peso de la arista
-                peso = datos.get('peso', 0)  # Acceso correcto al peso de la arista
-                peso = round(peso, 3)  # Redondear el peso a 3 decimales
-
-                # Dibujar la arista
-                mapa.plot([x_origen, x_destino], [y_origen, y_destino], color='blue', linewidth=1)
-
-                # Calcular la posición intermedia para colocar el peso
-                mid_x, mid_y = (x_origen + x_destino) / 2, (y_origen + y_destino) / 2
-
-                # Dibujar el peso en la posición intermedia
-                plt.text(mid_x, mid_y, f"{peso} km", fontsize=8, ha='center', color='black')
-
-            except KeyError as e:
-                print(f"Error: No se encontró la posición para los nodos {origen} o {destino}: {e}")
-
-        plt.title("Subgrafo Conectado con Fondo de Mapa", fontsize=14)
+        # Guardar la imagen
+        plt.title("Subgrafo Conectado Visualizado", fontsize=14)
         plt.savefig(ruta)
         plt.close()
         print(f"Grafo conectado guardado como imagen en: {ruta}")
