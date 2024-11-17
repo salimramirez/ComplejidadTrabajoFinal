@@ -12,6 +12,21 @@ header {
     text-align: center;
 }
 
+header nav a {
+    color: white; /* Cambia este color por el que prefieras */
+    text-decoration: none; /* Opcional: Elimina el subrayado */
+    margin: 0 15px; /* Añade separación horizontal entre los enlaces */
+    padding: 5px 10px; /* Opcional: Añade espacio interno alrededor del texto */
+    display: inline-block; /* Asegura un buen comportamiento del espaciado */
+}
+
+header nav a:hover {
+    color: white; /* Cambia el color al pasar el mouse (opcional) */
+    background-color: #1c7ad7; /* Opcional: Fondo al hacer hover */
+    border-radius: 5px; /* Opcional: Bordes redondeados al hacer hover */
+}
+
+
 header .logo {
     width: 50px;
     vertical-align: middle;
