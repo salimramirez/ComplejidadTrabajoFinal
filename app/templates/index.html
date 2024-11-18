@@ -3,13 +3,49 @@
 {% block title %}Inicio{% endblock %}
 
 {% block content %}
-<div>
-    <h2>Bienvenido</h2>
+
+<h2>Bienvenido a la aplicación de SkyMan</h2>
+
+<section class="informacion-uso">
+    <div class="contenido-uso">
+        <!-- Columna izquierda: Texto -->
+        <div class="texto-uso">
+            <h3>¿Qué es SkyMan?</h3>
+            <p>
+                SkyMan es una herramienta interactiva diseñada para facilitar la visualización y análisis del tráfico aéreo en América. 
+                Con esta aplicación, puedes explorar rutas entre aeropuertos, obtener información detallada de terminales aéreas y 
+                visualizar conexiones en un grafo dinámico. 
+            </p>
+            <h3>¿Cómo usar la aplicación?</h3>
+            <p>
+                Esta herramienta te permite interactuar con el tráfico aéreo de América mediante las siguientes funcionalidades:
+            </p>
+            <ul>
+                <li><strong>Calcular Ruta:</strong> Ingresa un aeropuerto de origen y uno de destino para encontrar la ruta más corta entre ellos.</li>
+                <li><strong>Buscar Aeropuertos:</strong> Encuentra información detallada sobre un aeropuerto específico.</li>
+                <li><strong>Ver Información del Grafo:</strong> Visualiza la red de aeropuertos y sus conexiones.</li>
+            </ul>
+        </div>
+        <!-- Columna derecha: Imagen -->
+        <div class="imagen-uso">
+            <img src="{{ url_for('static', filename='img/mapa.png') }}" alt="Mapa de Tráfico Aéreo">
+        </div>
+    </div>
+</section>
+
+<section class="inicio">
     <p>Selecciona una de las opciones:</p>
-    <ul>
-        <li><a href="{{ url_for('dijkstra.calcular_ruta') }}">Calcular Ruta</a></li>
-        <li><a href="{{ url_for('buscar.buscar') }}">Buscar Aeropuertos</a></li>
-        <li><a href="{{ url_for('grafo.visualizar_grafo') }}">Ver Información del Grafo</a></li>
-    </ul>
-</div>
+    <div class="opciones">
+        <div class="opcion">
+            <a href="{{ url_for('dijkstra.calcular_ruta') }}">Calcular Ruta</a>
+        </div>
+        <div class="opcion">
+            <a href="{{ url_for('buscar.buscar') }}">Buscar Aeropuertos</a>
+        </div>
+        <div class="opcion">
+            <a href="{{ url_for('grafo.visualizar_grafo') }}">Ver Información del Grafo</a>
+        </div>
+    </div>
+</section>
+
 {% endblock %}

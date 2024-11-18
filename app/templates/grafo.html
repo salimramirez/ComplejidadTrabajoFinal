@@ -3,6 +3,8 @@
 {% block title %}Visualización del Grafo{% endblock %}
 
 {% block content %}
-<h2>Visualización del Grafo</h2>
-<img src="{{ url_for('static', filename='img/grafo.png') }}" alt="Grafo" style="max-width: 100%; height: auto;">
+<h2 style="text-align: center;">Visualización del Grafo</h2>
+<div style="display: flex; justify-content: center; align-items: center; margin-top: 20px;">
+    <img src="{{ url_for('static', filename='img/grafo.png') }}" alt="Grafo" style="max-width: 75%; height: auto;">
+</div>
 {% endblock %}

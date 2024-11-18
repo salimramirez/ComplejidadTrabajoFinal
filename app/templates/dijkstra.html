@@ -5,6 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calcular Ruta con Dijkstra</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        /* Formulario centrado */
+        main {
+            margin: 20px auto;
+            padding: 20px;
+            max-width: 600px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 20px;
+            margin-top: 150px; /* Espacio suficiente para evitar que el contenido quede oculto tras el header */
+            margin-bottom: 100px; /* Ajusta este valor al tamaño del footer */
+        }
+
+        h2 {
+            color: #003366;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            color: #004080;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 90%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #004080;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Resultados */
+        .resultados {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .resultados h3 {
+            color: #003366;
+            margin-bottom: 10px;
+        }
+
+        img {
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -24,19 +96,19 @@
         <form method="POST">
             <label for="origen">Origen (IATA):</label>
             <input type="text" id="origen" name="origen" required>
-            <br><br>
             <label for="destino">Destino (IATA):</label>
             <input type="text" id="destino" name="destino" required>
-            <br><br>
             <button type="submit">Calcular Ruta</button>
         </form>
 
         {% if distancia and ruta %}
+        <div class="resultados">
             <h3>Resultado:</h3>
             <p><strong>Distancia:</strong> {{ distancia }} km</p>
             <p><strong>Ruta:</strong> {{ ruta | join(' → ') }}</p>
             <h3>Visualización de la Ruta:</h3>
             <img src="{{ url_for('static', filename='img/ruta_dijkstra.png') }}" alt="Ruta Mínima" style="max-width: 100%; height: auto;">
+        </div>
         {% endif %}
     </main>
     <footer>
