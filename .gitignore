@@ -11,7 +11,7 @@ __pycache__/
 *.log
 
 # Ignorar imágenes generadas dinámicamente
-app/static/img/*.png
+# app/static/img/*.png
 
 # Ignorar configuraciones específicas del sistema operativo
 .DS_Store
